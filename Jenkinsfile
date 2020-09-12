@@ -2,30 +2,28 @@ pipeline {
 	agent any
 	tools{
 		dockerTool 'docker'
-    	}
-      parameters {
-	string(name: 'BRANCH', defaultValue: 'master', description: 'Which branch you want to consider for build?')
-      }
+	}
+	parameters {
+		string(name: 'BRANCH', defaultValue: 'master', description: 'Which branch you want to consider for build?')
+	}
 	stages {
 		stage('Build'){
 			steps{
-			    git branch: "${params.BRANCH}", url:'https://github.com/b16cs006/hello-world-webapp/'
+				git branch: "${params.BRANCH}", url:'https://github.com/b16cs006/hello-world-webapp/'
 			}
 		}
 		stage("Deploy") {
 			steps {
 				script{
 					withDockerRegistry( toolName: 'docker', credentialsId:'c867552a-ac40-49f4-8599-d2cf53571267') {
-					    image = docker.build('b16cs006/hello-world-webapp:latest')
-					    image.push()
+						image = docker.build('b16cs006/hello-world-webapp:latest')
+						image.push()
 					}
 				}
 			}
 		}
-
 	}
-
-        post {
+	post {
 		always{
 			script{
 				shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
@@ -38,5 +36,5 @@ pipeline {
 				echo "Status: " + response.content
 			}
 		}
-    	}
+	}
 }
