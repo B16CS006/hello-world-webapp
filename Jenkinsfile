@@ -1,12 +1,10 @@
 pipeline {
 	agent any
 	tools{
-		jdk 'openjdk-8'
-		maven 'maven-3'
 		dockerTool 'docker'
     	}
       parameters {
-        gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'BRANCH', type: 'PT_BRANCH'
+	string(name: 'BRANCH', defaultValue: 'master', description: 'Which branch you want to consider for build?')
       }
 	stages {
 		stage('Build'){
@@ -34,7 +32,8 @@ pipeline {
 		    script{
 			shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 			def reqBody = '{"text":"Project Name: hello-world-webapp\nBuild Commit: '+shortCommit+'\nBuild Status: s!!"}'
-			httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
+			echo reqBody
+		//	httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
 		    }
 		}
 		failure {
@@ -42,7 +41,8 @@ pipeline {
 		    script{
 			shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 			def reqBody = '{"text":"Project Name: hello-world-webapp\nBuild Commit: '+shortCommit+'\nBuild Status: f!!"}'
-			httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
+			echo reqBody
+		//	httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
 		    }
 		}
     	}
