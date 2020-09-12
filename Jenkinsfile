@@ -12,7 +12,6 @@ pipeline {
 			    git branch: "${params.BRANCH}", url:'https://github.com/b16cs006/hello-world-webapp/'
 			}
 		}
-
 		stage("Deploy") {
 			steps {
 				script{
@@ -27,23 +26,18 @@ pipeline {
 	}
 
         post {
-		success {
-		    echo "success"
-		    script{
-			shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-			def reqBody = '{"text":"Project Name: hello-world-webapp\nBuild Commit: '+shortCommit+'\nBuild Status: s!!"}'
-			echo reqBody
-		//	httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
-		    }
-		}
-		failure {
-		    echo "fail"
-		    script{
-			shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-			def reqBody = '{"text":"Project Name: hello-world-webapp\nBuild Commit: '+shortCommit+'\nBuild Status: f!!"}'
-			echo reqBody
-		//	httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody:reqBody , responseHandle: 'NONE', url: url, wrapAsMultipart: false
-		    }
+		always{
+			script{
+				shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+				def reqBody = '{"text":"Project Name: hello-world-webapp\nBranch: ' + params.BRANCH + '\nBuild Commit: '+shortCommit+'\nBuild Status: ' + currentBuild.result + '"}'
+				def url = 'https://api.flock.com/hooks/sendMessage/da560f49-2283-4bc0-bdb5-86c3f7c0c372' 
+				echo reqBody
+
+				def response = httpRequest url: url, contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: reqBody
+				echo "Status: " + response.status
+				echo "Status: " + response.content
+                  }
+
 		}
     	}
 }
