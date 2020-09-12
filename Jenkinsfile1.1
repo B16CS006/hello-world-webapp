@@ -1,0 +1,27 @@
+pipeline {
+	agent any
+	stages{
+		stage('SCM') {
+			steps{
+				checkout scm:
+				echo 'Fetching git repo...'
+			}
+		}
+		stage('Build') {
+			steps{
+				echo 'Building...'
+			}
+		}
+		stage('Test') {
+			steps{
+				echo 'Testing...'
+				echo 'No test available...'
+			}
+		}
+		stage('Deploy') {
+			steps{
+				echo 'Deploying...'
+			}
+		}
+	}
+}	
