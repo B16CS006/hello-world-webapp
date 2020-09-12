@@ -36,7 +36,7 @@ pipeline {
 				def response = httpRequest url: url, contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: reqBody
 				echo "Status: " + response.status
 				echo "Status: " + response.content
-                  }
+                  	}
 
 		}
     	}
